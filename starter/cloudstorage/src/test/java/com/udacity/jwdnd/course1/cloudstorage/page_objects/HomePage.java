@@ -1,9 +1,12 @@
 package com.udacity.jwdnd.course1.cloudstorage.page_objects;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
 
@@ -78,8 +81,13 @@ public class HomePage {
     @FindBy(id = "buttonCredentialClose")
     private WebElement buttonCredentialClose;
 
+    private WebDriver driver;
+    private WebDriverWait wait;
+
     public HomePage(WebDriver driver) {
         PageFactory.initElements(driver, this);
+        this.driver = driver;
+        this.wait = new WebDriverWait(driver, 10);
     }
 
     public void logoutUser() {
@@ -92,11 +100,16 @@ public class HomePage {
 
     public void toNotesTab() {
         navNotesTab.click();
+        wait.until(ExpectedConditions.or(
+                ExpectedConditions.visibilityOfElementLocated(By.id("nav-notes"))
+        ));
     }
 
     public void createNote(String noteTitle, String noteDescription) {
-        toNotesTab();
         btnAddNewNote.click();
+        wait.until(ExpectedConditions.or(
+                ExpectedConditions.visibilityOfElementLocated(By.id("noteModal"))
+        ));
 
         inputNoteTitle.clear();
         inputNoteTitle.sendKeys(noteTitle);
@@ -117,6 +130,9 @@ public class HomePage {
 
     public void setNthNoteDescription(int n, String description) {
         buttonsNoteEdit.get(n).click();
+        wait.until(ExpectedConditions.or(
+                ExpectedConditions.visibilityOfElementLocated(By.id("noteModal"))
+        ));
 
         inputNoteDesctription.clear();
         inputNoteDesctription.sendKeys(description);
@@ -128,10 +144,12 @@ public class HomePage {
         linksNoteDelete.get(n).click();
     }
 
-    
 
     public void toCredentialsTab() {
         navCredentialsTab.click();
+        wait.until(ExpectedConditions.or(
+                ExpectedConditions.visibilityOfElementLocated(By.id("nav-credentials"))
+        ));
     }
     
     public int getCredentialCount() {
@@ -152,6 +170,9 @@ public class HomePage {
 
     public String getNthCredentialUnencryptedPassword(int n) {
         credentialEditButtons.get(n).click();
+        wait.until(ExpectedConditions.or(
+                ExpectedConditions.visibilityOfElementLocated(By.id("credentialModal"))
+        ));
         String unencryptedPassword = inputCredentialPassword.getAttribute("value");
         buttonCredentialClose.click();
 
@@ -191,6 +212,9 @@ public class HomePage {
 
     public void createCredential(String url, String username, String password) {
         buttonNewCredential.click();
+        wait.until(ExpectedConditions.or(
+                ExpectedConditions.visibilityOfElementLocated(By.id("credentialModal"))
+        ));
 
         inputCredentialUrl.clear();
         inputCredentialUrl.sendKeys(url);

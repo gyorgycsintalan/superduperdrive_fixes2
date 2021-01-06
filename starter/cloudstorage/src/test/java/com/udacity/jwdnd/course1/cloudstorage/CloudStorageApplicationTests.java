@@ -6,8 +6,11 @@ import com.udacity.jwdnd.course1.cloudstorage.page_objects.ResultPage;
 import com.udacity.jwdnd.course1.cloudstorage.page_objects.SignupPage;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
@@ -132,16 +135,12 @@ class CloudStorageApplicationTests {
 	@Test
 	@Order(7)
 	void noteCreation() throws InterruptedException {
-		driver.get("http://localhost:" + port + "/login");
-		Assertions.assertEquals("Login", driver.getTitle());
-
-		loginPage = new LoginPage(driver);
-		loginPage.loginUser("testuser2", "123");
-		Thread.sleep(1000);
+		loginAsUser("testuser2", "123");
 
 		Assertions.assertEquals("Home", driver.getTitle());
 
 		homePage = new HomePage(driver);
+		homePage.toNotesTab();
 		int noteCount = homePage.getNoteCount();
 
 		homePage.createNote("title", "description body");
@@ -165,16 +164,12 @@ class CloudStorageApplicationTests {
 	@Test
 	@Order(8)
 	void secondNoteCreation() throws InterruptedException {
-		driver.get("http://localhost:" + port + "/login");
-		Assertions.assertEquals("Login", driver.getTitle());
-
-		loginPage = new LoginPage(driver);
-		loginPage.loginUser("testuser2", "123");
-		Thread.sleep(1000);
+		loginAsUser("testuser2", "123");
 
 		Assertions.assertEquals("Home", driver.getTitle());
 
 		homePage = new HomePage(driver);
+		homePage.toNotesTab();
 		int noteCount = homePage.getNoteCount();
 
 		homePage.createNote("title2", "description body2");
@@ -214,7 +209,6 @@ class CloudStorageApplicationTests {
 		homePage.toNotesTab();
 		Assertions.assertEquals("New Description", homePage.getNthNoteDescription(0));
 		homePage.logoutUser();
-
 	}
 
 	@Test
@@ -248,8 +242,8 @@ class CloudStorageApplicationTests {
 		loginAsUser("testuser2", "123");
 
 		homePage = new HomePage(driver);
-		int initialCredentialCount = homePage.getCredentialCount();
 		homePage.toCredentialsTab();
+		int initialCredentialCount = homePage.getCredentialCount();
 		homePage.createCredential("www.example.com", "user", "password");
 		Thread.sleep(1000);
 
@@ -287,6 +281,11 @@ class CloudStorageApplicationTests {
 		Assertions.assertNotEquals(homePage.getNthCredentialEncryptedPassword(0), homePage.getNthCredentialUnencryptedPassword(0));
 
 		homePage.credentialEditButtons.get(0).click();
+		WebDriverWait wait = new WebDriverWait(driver, 10);
+		wait.until(ExpectedConditions.or(
+				ExpectedConditions.visibilityOfElementLocated(By.id("credentialModal"))
+		));
+
 		homePage.setCredentialUrl("www.modified.com");
 		homePage.setCredentialUsername("modifiedUsername");
 		homePage.setCredentialPassword("modifiedPassword");
